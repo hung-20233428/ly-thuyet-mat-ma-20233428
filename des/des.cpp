@@ -1,19 +1,29 @@
 #include <cstdio>
 #include "bits.h"
 
+// Bang hoan vi ban dau IP (Initial Permutation) cua DES, 64 phan tu
+const int IP[64] = {
+    58, 50, 42, 34, 26, 18, 10, 2,
+    60, 52, 44, 36, 28, 20, 12, 4,
+    62, 54, 46, 38, 30, 22, 14, 6,
+    64, 56, 48, 40, 32, 24, 16, 8,
+    57, 49, 41, 33, 25, 17,  9, 1,
+    59, 51, 43, 35, 27, 19, 11, 3,
+    61, 53, 45, 37, 29, 21, 13, 5,
+    63, 55, 47, 39, 31, 23, 15, 7
+};
+
 int main() {
-    // Test 1: bang dong nhat 1..64, ket qua phai giong dau vao
-    int id[64];
-    for (int i = 0; i < 64; i++) id[i] = i + 1;
+    uint64_t plaintext = 0x0123456789ABCDEFULL;
+    uint64_t afterIP = permute(plaintext, 64, IP, 64);
 
-    // Test 2: bang dao nguoc 64..1, bit thap nhat nhay len bit cao nhat
-    int rev[64];
-    for (int i = 0; i < 64; i++) rev[i] = 64 - i;
+    // Tach thanh nua trai L0 (32 bit cao) va nua phai R0 (32 bit thap)
+    uint32_t L0 = (uint32_t)(afterIP >> 32);
+    uint32_t R0 = (uint32_t)(afterIP & 0xFFFFFFFFULL);
 
-    uint64_t x = 0x0123456789ABCDEFULL;
-    printf("identity : %016llX (ky vong 0123456789ABCDEF)\n",
-           (unsigned long long)permute(x, 64, id, 64));
-    printf("reverse  : %016llX (ky vong 8000000000000000)\n",
-           (unsigned long long)permute(0x1ULL, 64, rev, 64));
+    printf("Plaintext : %016llX\n", (unsigned long long)plaintext);
+    printf("Sau IP    : %016llX\n", (unsigned long long)afterIP);
+    printf("L0 = %08X (ky vong CC00CCFF)\n", L0);
+    printf("R0 = %08X (ky vong F0AAF0AA)\n", R0);
     return 0;
 }
